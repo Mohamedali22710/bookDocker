@@ -4,7 +4,6 @@ services:
   mongodb:
     image: mongo:latest
     container_name: mongodb_container
-    # سحب متغيرات اليوزر والباسورد من ملف .env لتأسيس قاعدة البيانات
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASS}
@@ -17,15 +16,16 @@ services:
     restart: always
 
   backend:
+  
+    # تم التعديل ليربط بحسابك على دوكر هب
     build: ./backend
+    image: mohamedali255/library-backend:latest 
     container_name: backend_container
     ports:
       - "${BACKEND_PORT}:${BACKEND_PORT}"
-    # ربط ملف الـ .env عشان المتغيرات تكون متاحة للكود (Node.js)
     env_file:
       - .env
     environment:
-      # ملاحظة: استخدمنا 'mongodb' كاسم للمضيف لأنه اسم الخدمة فوق
       - MONGO_URI=mongodb://${MONGO_USER}:${MONGO_PASS}@mongodb:${MONGO_PORT}/${DB_NAME}?authSource=admin
     depends_on:
       - mongodb
@@ -35,7 +35,10 @@ services:
     restart: on-failure
 
   frontend:
+  
+    # تم التعديل ليربط بحسابك على دوكر هب
     build: ./frontend
+    image: mohamedali255/library-frontend:latest
     container_name: frontend_container
     ports:
       - "3000:80"
