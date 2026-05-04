@@ -1,0 +1,15 @@
+# استخدم نسخة Node.js 20 المستقرة والخفيفة
+FROM node:20-alpine
+
+# تحديد مجلد العمل داخل الحاوية
+WORKDIR /app
+
+# نسخ ملفات الـ package وتثبيت المكتبات
+COPY package*.json ./
+RUN npm install
+
+# نسخ بقية كود المشروع
+COPY . .
+
+# تشغيل السيرفر
+CMD ["npm", "start"]

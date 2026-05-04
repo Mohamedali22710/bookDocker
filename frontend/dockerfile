@@ -1,0 +1,14 @@
+# استخدام نسخة Nginx Alpine (حجمها حوالي 5 ميجا بس!)
+FROM nginx:alpine
+
+# مسح ملفات Nginx الافتراضية عشان نحط ملفاتنا
+RUN rm -rf /usr/share/nginx/html/*
+
+# نسخ ملف الـ index.html وأي ملفات JS/CSS تانية للفولدر بتاع Nginx
+COPY . /usr/share/nginx/html/
+
+# فتح بورت 80 (البورت الافتراضي لـ Nginx)
+EXPOSE 80
+
+# تشغيل السيرفر في الـ foreground
+CMD ["nginx", "-g", "daemon off;"]

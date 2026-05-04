@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb_container
+    # سحب متغيرات اليوزر والباسورد من ملف .env لتأسيس قاعدة البيانات
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASS}
+    env_file:
+      - .env
+    networks:
+      - backend_net
+    volumes:
+      - mongo-data:/data/db
+    restart: always
+
+  backend:
+    build: ./backend
+    container_name: backend_container
+    ports:
+      - "${BACKEND_PORT}:${BACKEND_PORT}"
+    # ربط ملف الـ .env عشان المتغيرات تكون متاحة للكود (Node.js)
+    env_file:
+      - .env
+    environment:
+      # ملاحظة: استخدمنا 'mongodb' كاسم للمضيف لأنه اسم الخدمة فوق
+      - MONGO_URI=mongodb://${MONGO_USER}:${MONGO_PASS}@mongodb:${MONGO_PORT}/${DB_NAME}?authSource=admin
+    depends_on:
+      - mongodb
+    networks:
+      - frontend_net
+      - backend_net
+    restart: on-failure
+
+  frontend:
+    build: ./frontend
+    container_name: frontend_container
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - frontend_net
+    restart: always
+
+networks:
+  frontend_net:
+    driver: bridge
+  backend_net:
+    driver: bridge
+
+volumes:
+  mongo-data:
